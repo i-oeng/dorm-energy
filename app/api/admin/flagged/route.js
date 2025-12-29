@@ -1,3 +1,7 @@
+// NOT IMPLEMENTED
+// If needed, please contact islam.kossymbayev@gmail.com
+// Thank you for taking your precious time to look through the code!
+
 import { NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
 

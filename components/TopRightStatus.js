@@ -7,11 +7,11 @@ export default function TopRightStatus() {
 
   async function load() {
     try {
-      const res = await fetch("/api/me", { cache: "no-store" });
-      const data = await res.json();
+      const r = await fetch("/api/me", { cache: "no-store" });
+      const data = await r.json();
       setState({ loading: false, ...data });
-    } catch {
-      setState({ loading: false, ok: false });
+    } catch (e) {
+      setState({ loading: false, ok: false, error: String(e) });
     }
   }
 
@@ -19,23 +19,41 @@ export default function TopRightStatus() {
     load();
   }, []);
 
-  if (state.loading) return null;
-  if (!state.loggedIn) return null;
 
   return (
     <div style={box}>
-      <div style={{ fontWeight: 700 }}>Room: {state.roomId ?? "—"}</div>
-      <div style={{ fontSize: 12, opacity: 0.75 }}>{state.email}</div>
+      {state.loading && <div>Checking session…</div>}
 
-      <button
-        onClick={async () => {
-          await fetch("/api/auth/logout", { method: "POST" });
-          window.location.href = "/register";
-        }}
-        style={btn}
-      >
-        Logout
-      </button>
+      {!state.loading && state.loggedIn === false && (
+        <div>
+          <div style={{ fontWeight: 700 }}>Not logged in</div>
+          <div style={small}>/api/me says loggedIn=false</div>
+        </div>
+      )}
+
+      {!state.loading && state.loggedIn === true && (
+        <div>
+          <div style={{ fontWeight: 700 }}>Room: {state.roomId ?? "—"}</div>
+          <div style={small}>{state.email}</div>
+
+          <button
+            onClick={async () => {
+              await fetch("/api/auth/logout", { method: "POST" });
+              window.location.href = "/register";
+            }}
+            style={btn}
+          >
+            Logout
+          </button>
+        </div>
+      )}
+
+      {!state.loading && state.ok === false && (
+        <div>
+          <div style={{ fontWeight: 700 }}>Status error</div>
+          <div style={small}>{state.error || "Failed to load /api/me"}</div>
+        </div>
+      )}
     </div>
   );
 }
@@ -44,11 +62,17 @@ const box = {
   position: "fixed",
   top: 12,
   right: 16,
-  textAlign: "right",
+  zIndex: 999999,
+  padding: 10,
+  borderRadius: 12,
+  border: "1px solid #ddd",
+  background: "white",
   fontSize: 14,
   lineHeight: 1.2,
-  zIndex: 9999,
+  textAlign: "right",
 };
+
+const small = { fontSize: 12, opacity: 0.7, marginTop: 4 };
 
 const btn = {
   marginTop: 8,

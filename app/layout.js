@@ -1,4 +1,3 @@
-import "./globals.css";
 import TopRightStatus from "@/components/TopRightStatus";
 
 export default function RootLayout({ children }) {

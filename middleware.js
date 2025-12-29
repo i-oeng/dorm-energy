@@ -39,7 +39,7 @@ export async function middleware(req) {
     return NextResponse.redirect(new URL("/register", req.url));
   }
 
-  // logged in users shouldn't access register/login
+
   if (isRegister || isLogin) {
     return NextResponse.redirect(new URL("/submit", req.url));
   }
@@ -53,12 +53,12 @@ export async function middleware(req) {
 
   if (!error && profile?.room_id) hasRoom = true;
 
-  // logged in + has room -> block join
+
   if (hasRoom && isJoin) {
     return NextResponse.redirect(new URL("/submit", req.url));
   }
 
-  // logged in + no room -> force join
+
   if (!hasRoom && !isJoin) {
     return NextResponse.redirect(new URL("/join", req.url));
   }

@@ -62,7 +62,7 @@ export async function POST(req) {
 
     const roomId = profile.room_id;
 
-    // get room info
+
     const { data: room } = await supabaseServer
       .from("rooms")
       .select("occupants, active")
@@ -71,7 +71,7 @@ export async function POST(req) {
 
     if (!room?.active) return NextResponse.json({ ok: false, error: "Room inactive" }, { status: 403 });
 
-    // previous submission
+    
     const { data: prevRows } = await supabaseServer
       .from("submissions")
       .select("meter_kwh, day")

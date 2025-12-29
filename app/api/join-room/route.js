@@ -17,7 +17,7 @@ export async function POST(req) {
       return NextResponse.json({ ok: false, error: "Missing roomId/joinCode" }, { status: 400 });
     }
 
-    // Verify user from token (anon client)
+
     const anon = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -30,7 +30,7 @@ export async function POST(req) {
 
     const userId = userData.user.id;
 
-    // Fetch room (service role)
+
     const { data: room, error: roomErr } = await supabaseServer
       .from("rooms")
       .select("id, code, active")
@@ -40,12 +40,12 @@ export async function POST(req) {
     if (roomErr || !room) return NextResponse.json({ ok: false, error: "Room not found" }, { status: 404 });
     if (!room.active) return NextResponse.json({ ok: false, error: "Room inactive" }, { status: 403 });
 
-    // ✅ FIXED: room (not rooms)
+
     if (room.code !== joinCode) {
       return NextResponse.json({ ok: false, error: "Wrong join code" }, { status: 403 });
     }
 
-    // Link user -> room
+
     const { error: upErr } = await supabaseServer
       .from("profiles")
       .upsert({ user_id: userId, room_id: roomId, role: "student" });
