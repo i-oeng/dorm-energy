@@ -10,10 +10,28 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState("");
 
   async function onSubmit(e) {
     e.preventDefault();
     setErr("");
+    setLoading(true);
+    setMsg("");
+    try {
+      const data = await r.json();
+      if (!r.ok || !data.ok) {
+        setMsg(data.error || "Invalid email or password");
+        setLoading(false);
+        return;
+      }
+
+      router.push("/submit");
+    } catch {
+      setMsg("Network error");
+    } finally {
+      setLoading(false);
+    }
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) setErr(error.message);
@@ -60,11 +78,11 @@ export default function LoginPage() {
             required
           />
 
-          <button disabled={err} style={styles.primaryBtn} type="submit">
-            {err ? "Logging in..." : "Login"}
+          <button disabled={loading} style={styles.primaryBtn} type="submit">
+            {loading ? "Logging in..." : "Login"}
           </button>
 
-          {err ? <div style={styles.message}>{msg}</div> : null}
+          {msg ? <div style={styles.message}>{msg}</div> : null}
         </form>
       </div>
     </main>

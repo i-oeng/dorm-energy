@@ -10,10 +10,28 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState("");
 
   async function onSubmit(e) {
     e.preventDefault();
     setErr("");
+    setMsg("");
+    setLoading(true);
+    try {
+      const data = await r.json();
+      if (!r.ok || !data.ok) {
+        setMsg(data.error || "Registration failed");
+        setLoading(false);
+        return;
+      }
+
+      router.push("/join"); 
+    } catch (err) {
+      setMsg("Network error");
+    } finally {
+      setLoading(false);
+    }
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) setErr(error.message);
@@ -57,11 +75,11 @@ export default function LoginPage() {
             minLength={6}
           />
 
-          <button disabled={err} style={styles.primaryBtn} type="submit">
-            {err ? "Creating..." : "Sign up"}
+          <button disabled={loading} style={styles.primaryBtn} type="submit">
+            {loading ? "Creating..." : "Sign up"}
           </button>
 
-          {err ? <div style={styles.message}>{msg}</div> : null}
+          {msg ? <div style={styles.message}>{msg}</div> : null}
 
 
         </form>
