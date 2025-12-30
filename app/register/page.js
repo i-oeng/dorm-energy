@@ -13,46 +13,56 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
-  async function onSubmit(e) {
-    e.preventDefault();
-    setErr("");
-    setLoading(true);
-    setMsg("");
-    try {
-      const { error } = await supabase.auth.signUp({ email, password });
-      if (error) setErr(error.message);
-      else setOk(true);
-      const data = await r.json();
-      if (!r.ok || !data.ok) {
-        setMsg(data.error || "Invalid email or password");
-        setLoading(false);
-        return;
-      }
+async function onSubmit(e) {
+  e.preventDefault();
+  setMsg("");
+  setErr("");
+  setLoading(true);
 
-      router.push("/submit");
-    } catch {
-      setMsg("Network error");
-    } finally {
-      setLoading(false);
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/join`,
+      },
+    });
+
+    if (error) {
+      setMsg(error.message);
+      return;
     }
 
-    
+
+    if (!data?.session) {
+      setMsg("Check your email to confirm your account, then come back to log in.");
+      return;
+    }
+
+    router.push("/join");
+  } catch (e) {
+    console.error(e);
+    setMsg("Unexpected error. Check console.");
+  } finally {
+    setLoading(false);
   }
+}
+
 
   return (
     <main style={styles.page}>
       <div style={styles.card}>
 
-        <h1 style={styles.title}>Welcome!</h1>
+        <h1 style={styles.title}>Let's save electricity!</h1>
 
         <div style={styles.subtitle}>
-          Don&apos;t have an account?{" "}
+          Already have an account?{" "}
           <button
             type="button"
             style={styles.linkBtn}
-            onClick={() => router.push("/register")}
+            onClick={() => router.push("/login")}
           >
-            Sign up
+            Login
           </button>
         </div>
 
@@ -80,7 +90,7 @@ export default function LoginPage() {
           />
 
           <button disabled={loading} style={styles.primaryBtn} type="submit">
-            {loading ? "Logging in..." : "Login"}
+            {loading ? "Signing up..." : "Sign up"}
           </button>
 
           {msg ? <div style={styles.message}>{msg}</div> : null}
@@ -166,7 +176,7 @@ const styles = {
     borderRadius: 12,
     border: "1px solid rgba(59,130,246,0.45)",
     background:
-      "linear-gradient(180deg, rgba(59,130,246,0.9), rgba(37,99,235,0.9))",
+      "linear-gradient(180deg, rgba(238, 238, 11, 0.9), rgba(218, 242, 5, 0.9))",
     color: "white",
     fontWeight: 800,
     cursor: "pointer",

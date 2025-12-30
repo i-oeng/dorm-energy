@@ -16,29 +16,25 @@ export default function LoginPage() {
   async function onSubmit(e) {
     e.preventDefault();
     setErr("");
-    setLoading(true);
     setMsg("");
+    setLoading(true);
+
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) setErr(error.message);
-      else window.location.href = "/join";
-      const data = await r.json();
-      if (!r.ok || !data.ok) {
-        setMsg(data.error || "Invalid email or password");
-        setLoading(false);
+
+      if (error) {
+        setMsg(error.message); 
         return;
       }
 
-      router.push("/submit");
-    } catch {
-      setMsg("Network error");
+      router.push("/join"); 
+    } catch (e) {
+      console.error(e);
+      setMsg("Unexpected error. Check console.");
     } finally {
       setLoading(false);
     }
-
-    
   }
-
   return (
     <main style={styles.page}>
       <div style={styles.card}>
