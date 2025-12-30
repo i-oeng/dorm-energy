@@ -19,6 +19,9 @@ export default function LoginPage() {
     setLoading(true);
     setMsg("");
     try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) setErr(error.message);
+      else window.location.href = "/join";
       const data = await r.json();
       if (!r.ok || !data.ok) {
         setMsg(data.error || "Invalid email or password");
@@ -33,9 +36,7 @@ export default function LoginPage() {
       setLoading(false);
     }
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) setErr(error.message);
-    else window.location.href = "/join";
+    
   }
 
   return (

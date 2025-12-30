@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabaseBrowser";
 
 export default function LoginPage() {
-  const supabase = supabaseBrowser();
   const router = useRouter();
+  const supabase = supabaseBrowser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
@@ -16,43 +16,48 @@ export default function LoginPage() {
   async function onSubmit(e) {
     e.preventDefault();
     setErr("");
-    setMsg("");
     setLoading(true);
+    setMsg("");
     try {
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) setErr(error.message);
+      else setOk(true);
       const data = await r.json();
       if (!r.ok || !data.ok) {
-        setMsg(data.error || "Registration failed");
+        setMsg(data.error || "Invalid email or password");
         setLoading(false);
         return;
       }
 
-      router.push("/join"); 
-    } catch (err) {
+      router.push("/submit");
+    } catch {
       setMsg("Network error");
     } finally {
       setLoading(false);
     }
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) setErr(error.message);
-    else window.location.href = "/join";
+    
   }
 
   return (
     <main style={styles.page}>
       <div style={styles.card}>
 
-
-        <h1 style={styles.title}>Let's save electricity!</h1>
+        <h1 style={styles.title}>Welcome!</h1>
 
         <div style={styles.subtitle}>
-          Already have an account?{" "}
-          <button type="button" style={styles.linkBtn} onClick={() => router.push("/login")}>
-            Login
+          Don&apos;t have an account?{" "}
+          <button
+            type="button"
+            style={styles.linkBtn}
+            onClick={() => router.push("/register")}
+          >
+            Sign up
           </button>
         </div>
 
         <form onSubmit={onSubmit} style={styles.form}>
+
           <input
             style={styles.input}
             value={email}
@@ -70,18 +75,15 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
             type="password"
-            autoComplete="new-password"
+            autoComplete="current-password"
             required
-            minLength={6}
           />
 
           <button disabled={loading} style={styles.primaryBtn} type="submit">
-            {loading ? "Creating..." : "Sign up"}
+            {loading ? "Logging in..." : "Login"}
           </button>
 
           {msg ? <div style={styles.message}>{msg}</div> : null}
-
-
         </form>
       </div>
     </main>
@@ -93,7 +95,8 @@ const styles = {
     minHeight: "100vh",
     display: "grid",
     placeItems: "center",
-    background: "radial-gradient(circle at 30% 20%, #1f2937 0%, #0b0f14 40%, #05070a 100%)",
+    background:
+      "radial-gradient(circle at 30% 20%, #1f2937 0%, #0b0f14 40%, #05070a 100%)",
     padding: 18,
   },
   card: {
@@ -124,8 +127,18 @@ const styles = {
     border: "3px solid rgba(255,255,255,0.85)",
     boxSizing: "border-box",
   },
-  title: { margin: "10px 0 6px", fontSize: 28, fontWeight: 800, textAlign: "center" },
-  subtitle: { textAlign: "center", fontSize: 13.5, opacity: 0.75, marginBottom: 18 },
+  title: {
+    margin: "10px 0 6px",
+    fontSize: 28,
+    fontWeight: 800,
+    textAlign: "center",
+  },
+  subtitle: {
+    textAlign: "center",
+    fontSize: 13.5,
+    opacity: 0.75,
+    marginBottom: 18,
+  },
   linkBtn: {
     background: "none",
     border: "none",
@@ -152,7 +165,8 @@ const styles = {
     padding: "12px 14px",
     borderRadius: 12,
     border: "1px solid rgba(59,130,246,0.45)",
-    background: "linear-gradient(180deg, rgba(59,130,246,0.9), rgba(37,99,235,0.9))",
+    background:
+      "linear-gradient(180deg, rgba(59,130,246,0.9), rgba(37,99,235,0.9))",
     color: "white",
     fontWeight: 800,
     cursor: "pointer",
@@ -167,10 +181,21 @@ const styles = {
     color: "rgba(255,255,255,0.9)",
     fontSize: 13,
   },
-  orRow: { display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 10, alignItems: "center", marginTop: 14 },
+  orRow: {
+    display: "grid",
+    gridTemplateColumns: "1fr auto 1fr",
+    gap: 10,
+    alignItems: "center",
+    marginTop: 14,
+  },
   orLine: { height: 1, background: "rgba(255,255,255,0.10)" },
   orText: { fontSize: 12, opacity: 0.6 },
-  socialRow: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginTop: 10 },
+  socialRow: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr 1fr",
+    gap: 10,
+    marginTop: 10,
+  },
   socialBtn: {
     height: 44,
     borderRadius: 12,
