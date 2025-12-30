@@ -7,7 +7,7 @@ All dependencies are defined in `package.json`.
 
 # Project Information
 
-This project uses Cloudinary and Supabase for tracking users, collecting data, and authorization. 
+This project uses Cloudinary, Supabase and Vercel for tracking users, collecting data, authorization and deploying. 
 
 # Limitations
 We have encountered a few limitations during the development process. 
